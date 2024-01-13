@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.nio.ReadOnlyBufferException;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -28,5 +29,9 @@ public class UsuarioService {
         Usuario user = buscarPorID(id);
         user.setPassword(password);
         return user;
+    }
+    @Transactional
+    public List<Usuario> buscarTodos(){
+        return usuarioRepository.findAll();
     }
 }
