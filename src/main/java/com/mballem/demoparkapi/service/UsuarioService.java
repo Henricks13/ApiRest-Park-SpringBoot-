@@ -5,6 +5,9 @@ import com.mballem.demoparkapi.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.nio.ReadOnlyBufferException;
+
 @RequiredArgsConstructor
 @Service
 public class UsuarioService {
@@ -13,5 +16,11 @@ public class UsuarioService {
 @Transactional
     public Usuario salvar(Usuario usuario) {
         return usuarioRepository.save(usuario);
+    }
+@Transactional
+    public Usuario buscarPorID(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Usuario não Encontrado")
+        );
     }
 }
