@@ -6,13 +6,23 @@ import com.mballem.demoparkapi.web.dto.UsuarioCreateDTO;
 import com.mballem.demoparkapi.web.dto.UsuarioResponseDto;
 import com.mballem.demoparkapi.web.dto.UsuarioSenhaDto;
 import com.mballem.demoparkapi.web.dto.mapper.UsuarioMapper;
+import com.mballem.demoparkapi.web.exception.ErrorMessage;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.internal.bytebuddy.build.Plugin;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+@Tag(name = "Usuarios", description = "Contem todas as operações relativas aos recursos para cadastro,edição e leitura de um usuário")
 
 @RequiredArgsConstructor
 @RestController
@@ -20,6 +30,20 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    @Operation(
+            summary = "Criar um novo usuário",description = "Recurso para criar um novo usuário",
+            responses = {
+                    @ApiResponse(responseCode = "201",description = "Recurso criado com sucesso",
+                            content = @Content(mediaType = "application/json",schema = @Schema(implementation = UsuarioResponseDto.class))),
+
+                    @ApiResponse(responseCode = "409", description = "Usuário e-mail já cadastrado no sitema",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+
+                    @ApiResponse(responseCode = "422", description = "Recurso não processado por dados de entrada inválidos",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+
+            }
+    )
     @PostMapping
     public ResponseEntity<UsuarioResponseDto> create(@Valid @RequestBody UsuarioCreateDTO createDTO){
         Usuario user = usuarioService.salvar(UsuarioMapper.toUsuario(createDTO));
@@ -27,18 +51,53 @@ public class UsuarioController {
 
     }
 
+    @Operation(
+            summary = "Recuperar um usuario pelo id",description = "Recurso para recuperar um usuario pelo id",
+            responses = {
+                    @ApiResponse(responseCode = "200",description = "Recurso recuperado com sucesso",
+                            content = @Content(mediaType = "application/json",schema = @Schema(implementation = UsuarioResponseDto.class))),
+
+                    @ApiResponse(responseCode = "404", description = "Recurso não encontrado por dados de entrada inválidos",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+
+            }
+    )
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDto> getById(@PathVariable Long id){
         Usuario user = usuarioService.buscarPorID(id);
         return ResponseEntity.ok(UsuarioMapper.toDto(user));
     }
 
+    @Operation(
+            summary = "Atualizar senha",description = "Recurso para Atualizar senha do usuario pelo id",
+            responses = {
+                    @ApiResponse(responseCode = "204",description = "Senha alterada com sucesso",
+                            content = @Content(mediaType = "application/json",schema = @Schema(implementation = Void.class))),
+
+                    @ApiResponse(responseCode = "404", description = "Recurso não encontrado por dados de entrada inválidos",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+
+                    @ApiResponse(responseCode = "400", description = "Senha não confere",
+                                                content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+
+            }
+    )
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updatePassword(@PathVariable Long id, @Valid @RequestBody UsuarioSenhaDto dto){
         Usuario user = usuarioService.editarSenha(id, dto.getSenhaAtual(), dto.getNovaSenha(), dto.getConfirmaSenha());
         return ResponseEntity.noContent().build();
     }
 
+
+    @Operation(
+            summary = "Buscar Usuarios",description = "Recurso para buscar todos os Usuarios",
+            responses = {
+                    @ApiResponse(responseCode = "200",description = "Busca feita com sucesso",
+                            content = @Content(mediaType = "application/json",
+                                    array = @ArraySchema(schema = @Schema(implementation = List.class))))
+
+            }
+    )
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDto>> getAll(){
         List<Usuario> users = usuarioService.buscarTodos();
