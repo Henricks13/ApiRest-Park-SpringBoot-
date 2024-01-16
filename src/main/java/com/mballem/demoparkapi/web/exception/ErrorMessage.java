@@ -8,10 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
-import java.net.BindException;
 import java.util.HashMap;
 import java.util.Map;
-@Getter @ToString
+
+@Getter
+@ToString
 public class ErrorMessage {
 
     private String path;
@@ -26,17 +27,14 @@ public class ErrorMessage {
     }
 
     public ErrorMessage(HttpServletRequest request, HttpStatus status, String message) {
-
         this.path = request.getRequestURI();
         this.method = request.getMethod();
         this.status = status.value();
         this.statusText = status.getReasonPhrase();
         this.message = message;
-
     }
 
     public ErrorMessage(HttpServletRequest request, HttpStatus status, String message, BindingResult result) {
-
         this.path = request.getRequestURI();
         this.method = request.getMethod();
         this.status = status.value();
@@ -46,14 +44,10 @@ public class ErrorMessage {
     }
 
     private void addErrors(BindingResult result) {
-
         this.errors = new HashMap<>();
-        for(FieldError fieldError : result.getFieldErrors()){
-
-            this.errors.put(fieldError.getField(),fieldError.getDefaultMessage());
-
+        for (FieldError fieldError : result.getFieldErrors()) {
+            this.errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-
     }
 
 }
