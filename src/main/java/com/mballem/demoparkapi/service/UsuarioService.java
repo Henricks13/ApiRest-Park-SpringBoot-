@@ -29,7 +29,7 @@ public class UsuarioService {
 @Transactional
     public Usuario buscarPorID(Long id) {
         return usuarioRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Usuario id=%s não Encontrado",id))
+                () -> new EntityNotFoundException(String.format("Usuario id=%s não encontrado",id))
         );
     }
 @Transactional
@@ -47,5 +47,19 @@ public class UsuarioService {
     @Transactional
     public List<Usuario> buscarTodos(){
         return usuarioRepository.findAll();
+    }
+
+    @Transactional
+    public Usuario buscaPorUsername(String username) {
+    return usuarioRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Usuario com '%s' não encontrado",username))
+        );
+    }
+    @Transactional
+    public Usuario.Role buscarRolePorUsername(String username) {
+
+    return usuarioRepository.findRoleByUsername(username);
+
+
     }
 }
