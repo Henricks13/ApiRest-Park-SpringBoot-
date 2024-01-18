@@ -2,9 +2,9 @@ package com.mballem.demoparkapi.service;
 
 import com.mballem.demoparkapi.entity.Cliente;
 import com.mballem.demoparkapi.exception.CpfUniqueViolationException;
+import com.mballem.demoparkapi.exception.EntityNotFoundException;
 import com.mballem.demoparkapi.repository.ClienteRepository;
 import com.mballem.demoparkapi.repository.projection.ClienteProjection;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -21,25 +21,30 @@ public class ClienteService {
     private final ClienteRepository clienteRepository;
 
     @Transactional
-    public Cliente salvar (Cliente cliente){
+    public Cliente salvar(Cliente cliente) {
         try {
-
             return clienteRepository.save(cliente);
-
-        }
-        catch (DataIntegrityViolationException ex){
+        } catch (DataIntegrityViolationException ex) {
             throw new CpfUniqueViolationException(
-                    String.format("CPF '%s' não pode ser cadastrado, já existe no sistema",cliente.getCpf()));
+                    String.format("CPF '%s' não pode ser cadastrado, já existe no sistema", cliente.getCpf())
+            );
         }
     }
-    @Transactional
+
+    @Transactional(readOnly = true)
     public Cliente buscarPorId(Long id) {
         return clienteRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(String.format("Cliente id = %s não encontrado no sistema", id))
+                () -> new EntityNotFoundException(String.format("Cliente id=%s não encontrado no sistema", id))
         );
     }
-    @Transactional
-    public Page<ClienteProjection> buscarToodos(Pageable pageable) {
-        return clienteRepository.findAllPageble(pageable);
+
+    @Transactional(readOnly = true)
+    public Page<ClienteProjection> buscarTodos(Pageable pageable) {
+        return clienteRepository.findAllPageable(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Cliente buscarPorUsuarioId(Long id) {
+        return clienteRepository.findByUsuarioId(id);
     }
 }

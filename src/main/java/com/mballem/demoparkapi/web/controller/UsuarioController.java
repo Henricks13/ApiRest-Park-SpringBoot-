@@ -67,9 +67,9 @@ public class UsuarioController {
             security = @SecurityRequirement(name = "security"),
             responses = {
                     @ApiResponse(responseCode = "204", description = "Senha atualizada com sucesso"),
-                    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para acessar este recurso",
+                    @ApiResponse(responseCode = "400", description = "Senha não confere",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
-                    @ApiResponse(responseCode = "404", description = "Recurso não encontrado",
+                    @ApiResponse(responseCode = "403", description = "Usuário sem permissão para acessar este recurso",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "422", description = "Campos invalidos ou mal formatados",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))

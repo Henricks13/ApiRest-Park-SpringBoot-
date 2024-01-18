@@ -23,7 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-@Tag(name = "Autenticação", description = "Recurso para proceder com a Autenticação na API")
+
+@Tag(name = "Autenticação", description = "Recurso para proceder com a autenticação na API")
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -35,11 +36,11 @@ public class AutenticacaoController {
 
     @Operation(summary = "Autenticar na API", description = "Recurso de autenticação na API",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Autenticação realizada com sucesso e retorno de bearer token",
+                    @ApiResponse(responseCode = "200", description = "Autenticação realizada com sucesso e retorno de um bearer token",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UsuarioResponseDto.class))),
-                    @ApiResponse(responseCode = "400", description = "Credenciáis Inválidas",
+                    @ApiResponse(responseCode = "400", description = "Credenciais inválidas",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
-                    @ApiResponse(responseCode = "422", description = "Campos Inválidos",
+                    @ApiResponse(responseCode = "422", description = "Campo(s) Inválido(s)",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             })
     @PostMapping("/auth")

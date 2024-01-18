@@ -1,19 +1,19 @@
 package com.mballem.demoparkapi.web.dto;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.br.CPF;
 
-@NoArgsConstructor @AllArgsConstructor @Getter @Setter
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 public class ClienteCreateDto {
-    @NotNull @Size(min = 5, max = 100)
+    @NotBlank
+    @Size(min = 5, max = 100)
     private String nome;
     @Size(min = 11, max = 11)
     @CPF
     private String cpf;
-
 }
