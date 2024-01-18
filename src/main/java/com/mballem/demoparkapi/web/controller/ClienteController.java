@@ -2,12 +2,15 @@ package com.mballem.demoparkapi.web.controller;
 
 import com.mballem.demoparkapi.entity.Cliente;
 import com.mballem.demoparkapi.jwt.JwtUserDetails;
+import com.mballem.demoparkapi.repository.projection.ClienteProjection;
 import com.mballem.demoparkapi.service.ClienteService;
 import com.mballem.demoparkapi.service.UsuarioService;
 import com.mballem.demoparkapi.web.dto.ClienteCreateDto;
 import com.mballem.demoparkapi.web.dto.ClienteResponseDto;
+import com.mballem.demoparkapi.web.dto.PageableDto;
 import com.mballem.demoparkapi.web.dto.UsuarioResponseDto;
 import com.mballem.demoparkapi.web.dto.mapper.ClienteMapper;
+import com.mballem.demoparkapi.web.dto.mapper.PageableMapper;
 import com.mballem.demoparkapi.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,10 +19,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "Clientes", description = "Contém todas as operações relativas ao recurso de um cliente")
 @RequiredArgsConstructor
@@ -65,5 +72,12 @@ public class ClienteController {
         public ResponseEntity<ClienteResponseDto> getById(@PathVariable Long id) {
             Cliente cliente = clienteService.buscarPorId(id);
             return  ResponseEntity.ok(ClienteMapper.toDto(cliente));
+        }
+
+        @GetMapping
+        @PreAuthorize("hasRole('ADMIN')")
+        public ResponseEntity<PageableDto> getAll(Pageable pageable) {
+            Page<ClienteProjection> clientes = clienteService.buscarToodos(pageable);
+            return  ResponseEntity.ok(PageableMapper.toDto(clientes));
         }
 }

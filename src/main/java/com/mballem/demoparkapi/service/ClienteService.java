@@ -3,11 +3,16 @@ package com.mballem.demoparkapi.service;
 import com.mballem.demoparkapi.entity.Cliente;
 import com.mballem.demoparkapi.exception.CpfUniqueViolationException;
 import com.mballem.demoparkapi.repository.ClienteRepository;
+import com.mballem.demoparkapi.repository.projection.ClienteProjection;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -32,5 +37,9 @@ public class ClienteService {
         return clienteRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(String.format("Cliente id = %s não encontrado no sistema", id))
         );
+    }
+    @Transactional
+    public Page<ClienteProjection> buscarToodos(Pageable pageable) {
+        return clienteRepository.findAllPageble(pageable);
     }
 }
