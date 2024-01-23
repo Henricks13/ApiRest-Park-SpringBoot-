@@ -1,7 +1,6 @@
 package com.mballem.demoparkapi;
 
-import com.mballem.demoparkapi.web.dto.mapper.VagaCreateDto;
-import com.mballem.demoparkapi.web.exception.ErrorMessage;
+import com.mballem.demoparkapi.web.dto.VagaCreateDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,42 +18,43 @@ public class VagaIT {
     WebTestClient testClient;
 
     @Test
-    public void criarVaga_comDadosValidos_RetornarLocationComStatus201(){
+    public void criarVaga_ComDadosValidos_RetornarLocationStatus201() {
         testClient
                 .post()
                 .uri("/api/v1/vagas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
-                .bodyValue(new VagaCreateDto("A-05","LIVRE"))
+                .bodyValue(new VagaCreateDto("A-05", "LIVRE"))
                 .exchange()
                 .expectStatus().isCreated()
                 .expectHeader().exists(HttpHeaders.LOCATION);
     }
 
     @Test
-    public void criarVaga_comCodigoJaExistente_RetornarErrorMessageComStatus409(){
+    public void criarVaga_ComCodigoJaExistente_RetornarErrorMessageComStatus409() {
         testClient
                 .post()
                 .uri("/api/v1/vagas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
-                .bodyValue(new VagaCreateDto("A-01","LIVRE"))
+                .bodyValue(new VagaCreateDto("A-01", "LIVRE"))
                 .exchange()
                 .expectStatus().isEqualTo(409)
                 .expectBody()
                 .jsonPath("status").isEqualTo(409)
                 .jsonPath("method").isEqualTo("POST")
                 .jsonPath("path").isEqualTo("/api/v1/vagas");
+
     }
 
     @Test
-    public void criarVaga_comDadosInvalidos_RetornarErrorMessageComStatus422(){
+    public void criarVaga_ComDadoInvalidos_RetornarErrorMessageComStatus422() {
         testClient
                 .post()
                 .uri("/api/v1/vagas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
-                .bodyValue(new VagaCreateDto("",""))
+                .bodyValue(new VagaCreateDto("", ""))
                 .exchange()
                 .expectStatus().isEqualTo(422)
                 .expectBody()
@@ -67,7 +67,7 @@ public class VagaIT {
                 .uri("/api/v1/vagas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
-                .bodyValue(new VagaCreateDto("A-501","DESOCUPADA"))
+                .bodyValue(new VagaCreateDto("A-501", "DESOCUPADA"))
                 .exchange()
                 .expectStatus().isEqualTo(422)
                 .expectBody()
@@ -76,24 +76,9 @@ public class VagaIT {
                 .jsonPath("path").isEqualTo("/api/v1/vagas");
     }
 
-    @Test
-    public void criarVaga_comUsuarioCliente_RetornarErrorMessageComStatus403(){
-        testClient
-                .post()
-                .uri("/api/v1/vagas")
-                .contentType(MediaType.APPLICATION_JSON)
-                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "123456"))
-                .bodyValue(new VagaCreateDto("A-06","LIVRE"))
-                .exchange()
-                .expectStatus().isEqualTo(403)
-                .expectBody()
-                .jsonPath("status").isEqualTo(403)
-                .jsonPath("method").isEqualTo("POST")
-                .jsonPath("path").isEqualTo("/api/v1/vagas");
-    }
 
     @Test
-    public void buscarVaga_comCodigoExistente_RetornarVagaComStatus409(){
+    public void buscarVaga_ComCodigoExistente_RetornarVagaComStatus200() {
         testClient
                 .get()
                 .uri("/api/v1/vagas/{codigo}", "A-01")
@@ -104,14 +89,15 @@ public class VagaIT {
                 .jsonPath("id").isEqualTo(10)
                 .jsonPath("codigo").isEqualTo("A-01")
                 .jsonPath("status").isEqualTo("LIVRE");
+
     }
 
     @Test
-    public void buscarVaga_comCodigoInxistente_RetornarErrorMessageComStatus404(){
+    public void buscarVaga_ComCodigoInexistente_RetornarErrorMessageComStatus404() {
         testClient
                 .get()
                 .uri("/api/v1/vagas/{codigo}", "A-10")
-                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
+                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@email.com", "123456"))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody()
@@ -121,19 +107,32 @@ public class VagaIT {
     }
 
     @Test
-    public void buscarVaga_comUsuarioCliente_RetornarErrorMessageComStatus403(){
+    public void buscarVaga_ComUsuarioSemPermissaoDeAcesso_RetornarErrorMessageComStatus403() {
         testClient
                 .get()
                 .uri("/api/v1/vagas/{codigo}", "A-01")
-                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "123456"))
+                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "123456"))
                 .exchange()
-                .expectStatus().isEqualTo(403)
+                .expectStatus().isForbidden()
                 .expectBody()
                 .jsonPath("status").isEqualTo(403)
                 .jsonPath("method").isEqualTo("GET")
                 .jsonPath("path").isEqualTo("/api/v1/vagas/A-01");
     }
 
-
-
+    @Test
+    public void criarVaga_ComUsuarioSemPermissaoDeAcesso_RetornarErrorMessageComStatus403() {
+        testClient
+                .post()
+                .uri("/api/v1/vagas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@email.com", "123456"))
+                .bodyValue(new VagaCreateDto("A-05", "OCUPADA"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo(403)
+                .jsonPath("method").isEqualTo("POST")
+                .jsonPath("path").isEqualTo("/api/v1/vagas");
+    }
 }

@@ -13,7 +13,9 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-@Entity @Table(name = "clientes_tem_vaga") @EntityListeners(AuditingEntityListener.class)
+@Entity
+@Table(name = "clientes_tem_vagas")
+@EntityListeners(AuditingEntityListener.class)
 public class ClienteVaga {
 
     @Id
@@ -37,9 +39,11 @@ public class ClienteVaga {
     private BigDecimal valor;
     @Column(name = "desconto", columnDefinition = "decimal(7,2)")
     private BigDecimal desconto;
-    @ManyToOne @JoinColumn(name = "id_cliente", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
-    @ManyToOne @JoinColumn(name = "id_vaga", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "id_vaga", nullable = false)
     private Vaga vaga;
 
     @CreatedDate
